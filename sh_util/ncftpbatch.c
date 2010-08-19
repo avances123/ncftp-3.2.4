@@ -1311,7 +1311,7 @@ DoItem(void)
 		if (result == kErrCouldNotStartDataTransfer) {
 			LogEndItemResult(1, "Remote item %s is no longer sendable.  Perhaps permission denied on destination?\n", gRFile);
 			result = -1;	/* Fabio ahora no borra la tarea */
-			LogEndItemResult(1, "El problema lo tiene el fichero local%s\n",gLFile);
+			LogEndItemResult(1, "El problema lo tiene el fichero %s\n",gLFile);
 		} else if ((result == kErrRemoteSameAsLocal) || (result == kErrLocalSameAsRemote)) {
 			LogEndItemResult(1, "Local item %s is already present on remote host.\n", gLFile);
 			result = 0; /* Fabio esto nunca pasa porque hacemos un delete incondicional del fichero remoto */
