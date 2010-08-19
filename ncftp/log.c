@@ -32,8 +32,8 @@ LogXfer(const char *const mode, const char *const url)
 {
 	FILE *fp;
 
-	if (gMaxLogSize == 0)
-		return;		/* Don't log */
+	//if (gMaxLogSize == 0)
+	//	return;		/* Don't log */
 
 	fp = fopen(gLogFileName, FOPEN_APPEND_TEXT);
 	if (fp != NULL) {
@@ -50,8 +50,8 @@ LogOpen(const char *const host)
 	time_t now;
 	FILE *fp;
 
-	if (gMaxLogSize == 0)
-		return;		/* Don't log */
+	//if (gMaxLogSize == 0)
+	//	return;		/* Don't log */
 
 	time(&now);
 	fp = fopen(gLogFileName, FOPEN_APPEND_TEXT);
@@ -81,6 +81,7 @@ EndLog(void)
 	 * so it doesn't waste too much disk space.  If the log is too fat, trim the
 	 * older lines (at the top) until we're under the limit.
 	 */
+	return;
 	if ((gMaxLogSize <= 0) || (Stat(gLogFileName, &st) < 0))
 		return;						   /* Never trim, or no log. */
 

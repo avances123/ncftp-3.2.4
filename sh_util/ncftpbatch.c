@@ -376,10 +376,10 @@ OpenLog(void)
 		return (0);
 
 	openMode = gLogOpenMode;
-	if ((Stat(gLogFileName, &st) == 0) && (st.st_size > gMaxLogSize)) {
-		/* Prevent the log file from growing forever. */
-		openMode = FOPEN_WRITE_TEXT;
-	}
+	//if ((Stat(gLogFileName, &st) == 0) && (st.st_size > gMaxLogSize)) {
+	//	/* Prevent the log file from growing forever. */
+	//	openMode = FOPEN_WRITE_TEXT;
+	//}
 
 #if (defined(WIN32) || defined(_WINDOWS)) && !defined(__CYGWIN__)
 	fp = _fsopen(gLogFileName, openMode, _SH_DENYNO);
@@ -1310,18 +1310,20 @@ DoItem(void)
 		}
 		if (result == kErrCouldNotStartDataTransfer) {
 			LogEndItemResult(1, "Remote item %s is no longer sendable.  Perhaps permission denied on destination?\n", gRFile);
-			result = 0;	/* file no longer on host */
+			result = -1;	/* Fabio ahora no borra la tarea */
+			LogEndItemResult(1, "El problema lo tiene el fichero local%s\n",gLFile);
 		} else if ((result == kErrRemoteSameAsLocal) || (result == kErrLocalSameAsRemote)) {
 			LogEndItemResult(1, "Local item %s is already present on remote host.\n", gLFile);
-			result = 0;
+			result = 0; /* Fabio esto nunca pasa porque hacemos un delete incondicional del fichero remoto */
 		} else if (result == kErrRemoteFileNewer) {
 			LogEndItemResult(1, "Local item %s is already present on remote host and is newer.\n", gLFile);
-			result = 0;
+			result = 0; /* Fabio esto nunca pasa porque hacemos un delete incondicional del fichero remoto */
 		} else if (result == kNoErr) {
 			(void) AdditionalCmd(&gConn, gPerFileFTPCommand, gLFile);
 			LogEndItemResult(1, "Succeeded uploading %s.\n", gLFile);
 		} else {
 			LogEndItemResult(1, "Error (%d) occurred on %s: %s\n", result, gLFile, FTPStrError(result));
+			result=-1; /* Fabio ahora no borra la tarea */
 		}
 	}
 	
@@ -1337,7 +1339,8 @@ DoItem(void)
 			/* We logged the error, but do not attempt to
 			 * retry this spool entry.
 			 */
-			result = 0;
+			LogEndItemResult(1, "Error (%d) occurred on %s: %s\n", result, gLFile, FTPStrError(result));
+			result = -1;//reintenta con cualquiera de estos errores.
 			break;
 	}
 	
@@ -1507,7 +1510,7 @@ EventShell(volatile unsigned int sleepval)
 				}
 
 				(void) FTPCloseHost(&gConn);
-				Log(0, "Sleeping %u seconds before starting pass %d.\n", sleepval, passes);
+				//Log(0, "Sleeping %u seconds before starting pass %d.\n", sleepval, passes);
 				if ((sleepval == 0) || (sleepval > 30000)) {
 					Log(0, "Panic: invalid sleep amount %u.\n", sleepval);
 					exit(1);
@@ -1531,7 +1534,7 @@ EventShell(volatile unsigned int sleepval)
 		}
 
 		gLastHost[0] = '\0';	/* clear [failed]LastHost before starting a pass */
-		Log(0, "Starting pass %d.\n", passes);
+		//Log(0, "Starting pass %d.\n", passes);
 		if (passes >= 1000000) {
 			/* This "panic" and the one a few lines above
 			 * are here temporarily; I think the bug this
@@ -1662,7 +1665,7 @@ EventShell(volatile unsigned int sleepval)
 						minDSLF = gDelaySinceLastFailure;
 				} else {
 					nFinished++;
-					Log(0, "Done with %s.\n", gItemPath);
+					Log(0, "Exito subiendo, borramos tarea: %s.\n", gItemPath);
 					if (unlink(gMyItemPath) != 0) {
 						/* quit now */
 						Log(0, "Could not delete finished job %s!\n", gMyItemPath);
