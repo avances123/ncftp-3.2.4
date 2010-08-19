@@ -652,6 +652,7 @@ FTPCloseHost(const FTPCIPtr cip)
 void
 FTPInitialLogEntry(const FTPCIPtr cip)
 {
+	return;  // Fabio 20100819 Este metodo solo escribe heces acerca del sistema operativo que lo ejecuta
 #if defined(HAVE_UNAME) && defined(HAVE_SYS_UTSNAME_H)
 	struct utsname u;
 #endif
@@ -665,6 +666,7 @@ FTPInitialLogEntry(const FTPCIPtr cip)
 		 * since the user may not have set the debugLog
 		 * fields right away.
 		 */
+
 		PrintF(cip, "%s compiled for %s\n",
 			gLibNcFTPVersion + 5,
 #ifdef O_S
